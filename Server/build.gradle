@@ -11,7 +11,7 @@ plugins {
 
 application {
     // Define the main class for the application.
-    mainClassName = 'redes.JogoDePerguntas.App'
+    mainClassName = 'redes.JogoDePerguntas.Server'
 }
 
 run {
