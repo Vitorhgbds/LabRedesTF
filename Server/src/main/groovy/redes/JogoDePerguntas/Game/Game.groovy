@@ -23,8 +23,6 @@ class Game {
         if (gameMode == GameMode.DIFICIL){
             repositoryQuestion = QuestionRepository.CreateQuestionsDificil()
         }
-
-
         ponto=0
     }
     def static Menu(){
@@ -60,7 +58,8 @@ class Game {
         }else {
             question = repositoryQuestion.removeFirst()
             return question.question + "\n"+ "A. "+ question.answers.answers.get("A") +" \n" +
-                    "B. "+question.answers.answers.get("B") + "\n"+ "C. "+ question.answers.answers.get("C") + "\n"+ "D. "+ question.answers.answers.get("D")
+                    "B. "+question.answers.answers.get("B") + "\n"+ "C. "+ question.answers.answers.get("C") + "\n"+
+                    "D. "+ question.answers.answers.get("D")
         }
     }
     def static VerifyAnswer(String response){
