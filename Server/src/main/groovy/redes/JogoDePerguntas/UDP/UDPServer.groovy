@@ -2,56 +2,54 @@ package redes.JogoDePerguntas.UDP
 
 import redes.JogoDePerguntas.Game.GameMode
 import redes.JogoDePerguntas.Game.Game
-class UDPServer {
+import redes.JogoDePerguntas.Game.Player
 
+class UDPServer {
+    static Map<Integer, Player> playerList
     def static Server(){
+        playerList = new HashMap<>()
         def socketServer = new DatagramSocket(5000)
         def buffer = (' ' * 4096) as byte[]
-        Game.gameMode = GameMode.FACIL
-        Game.Start()
-        Game.Menu()
+        Game game = new Game()
+        game.Menu()
         while(true) {
             def incoming = new DatagramPacket(buffer, buffer.length)
             socketServer.receive(incoming)
             def s = new String(incoming.data, 0, incoming.length)
-            String reply = Response(s)
+            String reply = Response(s, game, incoming.port)
             def outgoing = new DatagramPacket(reply.bytes, reply.size(),
                     incoming.address, incoming.port);
             socketServer.send(outgoing)
         }
     }
 
-    def static Response(String s){
+    def static Response(String s, Game game, Integer port){ println(port)
         switch (s){
-            case "0": return Game.menu;
-            case "First Contact": return Game.menu;
+            case "0": return game.Menu()
+            case "First Contact":  playerList.put(port,new Player())
+                return Game.menu;
                 break;
-            case "1": Game.gameMode = GameMode.FACIL
-                Game.Start()
-                return "Jogo facil iniciado \n\n" + Game.getQuestion()
+            case "1": playerList.get(port).mode = GameMode.FACIL
+                game.Start(playerList.get(port))
+                return "Jogo facil iniciado \n\n" + game.getQuestion(playerList.get(port))
                 break;
             case "2":
-                Game.gameMode = GameMode.MEDIO
-                Game.Start()
-                return "Jogo medio iniciado \n\n" + Game.getQuestion()
+                playerList.get(port).mode = GameMode.MEDIO
+                game.Start(playerList.get(port))
+                return "Jogo medio iniciado \n\n" + game.getQuestion(playerList.get(port))
                 break
-            case "3": Game.gameMode = GameMode.DIFICIL
-                Game.Start()
-                return "Jogo dificil  iniciado \n\n" + Game.getQuestion()
+            case "3": playerList.get(port).mode = GameMode.DIFICIL
+                game.Start(playerList.get(port))
+                return "Jogo dificil  iniciado \n\n" + game.getQuestion(playerList.get(port))
                 break
-            case "A": return Game.VerifyAnswer("A") +"\n\n" + Game.getQuestion()
+            case "A": return game.VerifyAnswer("A",playerList.get(port)) +"\n\n" + game.getQuestion(playerList.get(port))
                 break
-            case "B": return Game.VerifyAnswer("B") +"\n\n" + Game.getQuestion()
+            case "B": return game.VerifyAnswer("B",playerList.get(port)) +"\n\n" + game.getQuestion(playerList.get(port))
                 break
-            case "C": return Game.VerifyAnswer("C") +"\n\n" + Game.getQuestion()
+            case "C": return game.VerifyAnswer("C",playerList.get(port)) +"\n\n" + game.getQuestion(playerList.get(port))
                 break
-            case "D": return Game.VerifyAnswer("D") +"\n\n" + Game.getQuestion()
+            case "D": return game.VerifyAnswer("D",playerList.get(port)) +"\n\n" + game.getQuestion(playerList.get(port))
                 break
-            case "-1": try{
-                System.exit(0)
-                } catch(ignored){
-
-                }
             default: return "A resposta é invalida. Tente novamente"
         }
     }
