@@ -35,7 +35,6 @@ class Game {
                 "                   2. Jogo Medio\n" +
                 "                   3. Jogo Dificil\n" +
                 "                   Maior pontuacao:"+melhorPontuacao+"                                    \n"+
-                "                   -1. Exit\n"+
                 "=========================================================="
     }
 

@@ -66,9 +66,9 @@ class QuestionRepository {
         Questions questions6 = new Questions("Qual é a utilidade de um servidor DHCP? ","B");
         Answers answers6 = new Answers()
         answers6.add("A","É um protocolo para configuracao de roteadores.")
-        answers6.add("B","Fornecer números IP automaticamente para novos membros da rede ")
+        answers6.add("B","Fornecer numeros IP automaticamente para novos membros da rede ")
         answers6.add("C","Monitorar a rede e informar ao root cada vez que um novo membro se conecta ")
-        answers6.add("D","Compartilhar de forma dinâmica e equitativa os recursos da rede")
+        answers6.add("D","Compartilhar de forma dinamica e equitativa os recursos da rede")
 
         questions6.answers = answers6
 
@@ -95,7 +95,7 @@ class QuestionRepository {
         Answers answers2 = new Answers()
         answers2.add("A","Endereco de rede + codigo de acesso")
         answers2.add("B","Host + rede")
-        answers2.add("C","Rede + host + número de hosts")
+        answers2.add("C","Rede + host + numero de hosts")
         answers2.add("D","Rede + host")
 
         questions2.answers = answers2
@@ -136,9 +136,9 @@ class QuestionRepository {
         questionsMedio.add(questions5)
 
         Questions questions6 = new Questions("Analise as seguintes afirmativas e diga quais estao corretas:\n" +
-                "I – O repetidor e um dispositivo da camada de transporte. Ele recebe, amplifica (regenera) e retransmite sinais em ambos os sentidos. \n" +
-                "II – Os hubs sao dispositivos da camada fisica e, normalmente, nao amplificam os sinais de entrada. I\n" +
-                "II – Os switches e as pontes (bridges) sao dispositivos da camada de enlace e o roteamento desses dispositivos e baseado em enderecos de quadro. \n","B");
+                "I  O repetidor e um dispositivo da camada de transporte. Ele recebe, amplifica (regenera) e retransmite sinais em ambos os sentidos. \n" +
+                "II  Os hubs sao dispositivos da camada fisica e, normalmente, nao amplificam os sinais de entrada. I\n" +
+                "II  Os switches e as pontes (bridges) sao dispositivos da camada de enlace e o roteamento desses dispositivos e baseado em enderecos de quadro. \n","B");
         Answers answers6 = new Answers()
         answers6.add("A","I, II e III.")
         answers6.add("B","II e III, apenas.")
@@ -193,7 +193,7 @@ class QuestionRepository {
         answers4.add("A","A topologia em estrela e uma evolucao da topologia em barramento: possui um aparelho concentrador (hub ou switch) que interconecta todos os cabos que vêm dos computadores (nos) e pode, ainda, interconectar outras redes facilmente, sendo a topologia mais utilizada para redes locais.")
         answers4.add("B","Em todos os tipos de topologias para redes do tipo LAN, so se permite atingir taxas de ate 10 Mbps.")
         answers4.add("C","Na topologia em barramento, quando um no da rede esta danificado, a comunicacao continua a ser efetuada na rede normalmente.")
-        answers4.add("D","As topologias das redes estao fundamentadas nas tecnologias LAN, MAN e WAN, como as topologias em anel, as em estrela e as em barramento, com grande predominância da topologia em anel.")
+        answers4.add("D","As topologias das redes estao fundamentadas nas tecnologias LAN, MAN e WAN, como as topologias em anel, as em estrela e as em barramento, com grande predominancia da topologia em anel.")
 
         questions4.answers = answers4
 
