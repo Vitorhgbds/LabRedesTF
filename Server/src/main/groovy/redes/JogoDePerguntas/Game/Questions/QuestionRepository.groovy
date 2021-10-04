@@ -5,18 +5,26 @@ class QuestionRepository {
     static LinkedList<Questions> questionsFacil
     static LinkedList<Questions> questionsMedio
     static LinkedList<Questions> questionsDificil
-
+/*
+    Essa classe preeche 3 listas de questões, uma para o nivel facil, outra pro nivel medio e uma para o nivel dificil.
+    São 6 questões para cada nivel, cada questão com quatro alternativas.
+    Para mais detalhes cheque o CreateQuestionsFacil(), quando adicionamos a primeira questão
+*/
     def static CreateQuestionsFacil(){
         questionsFacil = new LinkedList<>();
+        // Criando uma questão e informando o enunciado da questão e a alternativa correta
         Questions questions1 = new Questions("Em qual nivel de camada o protocolo TCP/IP trabalha?","D");
         Answers answers = new Answers()
+        //Criando as alternativas
         answers.add("A","Aplicacao")
         answers.add("B","Enlace")
         answers.add("C","Transporte")
         answers.add("D","Rede")
 
+        // Conectando a lista de alternativas à questao
         questions1.answers = answers
 
+        // adicionando a questão à lista
         questionsFacil.add(questions1)
 
         Questions questions2 = new Questions("Qual a funcao de um roteador em uma rede de computadores?","C");

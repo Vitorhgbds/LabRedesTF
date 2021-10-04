@@ -1,7 +1,7 @@
 # Jogo de Perguntas
 ## Regras do Jogo
 
-- [ ] No mínimo 2 jogadores
+- [x] No mínimo 2 jogadores
 - [x] Dar pontos para o jogador a medida que ele acerte respostas
 - [x] Ter 3 níveis diferentes de dificuldade
 - [x] Apresentar uma pergunta por vez e mostrar opções de resposta

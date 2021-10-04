@@ -1,12 +1,14 @@
 package redes.JogoDePerguntas.Game
 
 import redes.JogoDePerguntas.Game.Questions.QuestionRepository
-import redes.JogoDePerguntas.Game.Questions.Questions
+/*
+    Classe Game gerencia as coisas relacionadas ao jogo
+*/
+
 
 class Game {
     def static menu
     def static melhorPontuacao = 0
-    static GameMode gameMode
 
     def Start(Player player){
         player.currentQuestions = null;
@@ -22,6 +24,8 @@ class Game {
         }
        player.ponto=0
     }
+
+    // Mostra o menu e a melhor pontaçao
     def static Menu(){
          menu = "  _______ _             _____                      \n" +
                 " |__   __| |           / ____|                     \n" +
@@ -38,10 +42,16 @@ class Game {
                 "=========================================================="
     }
 
+    /*
+        Atualiza a melhor pontuacao
+    */
     def updateMelhorPontuacao(Player player){
         if (melhorPontuacao<player.ponto) melhorPontuacao=player.ponto
     }
 
+    /*
+        Metodo que pega as questoes da lista de questoes e, se não tem questões na lista, anuncia o fim do jogo
+    */
     def getQuestion(Player player){
         if (player.currentQuestions.isEmpty()){
             updateMelhorPontuacao(player)
@@ -58,6 +68,10 @@ class Game {
                     "D. "+ player.question.answers.answers.get("D")
         }
     }
+
+    /*
+        Verifica se a resposta esta correta e, se está correta, adiciona pontos ao jogador.
+    */
     def VerifyAnswer(String response, Player player){
         if (!player.finalizado){
             if (response.equals(player.question.rightResponse)) {
@@ -79,7 +93,9 @@ class Game {
                             "SUA PONTUACAO: "+player.ponto+"\n" +
                             "MELHOR PONTUACAO: "+melhorPontuacao
                 }
-            } else return "A resposta esta errada"
+            } else return "A resposta esta errada \n"+
+                    "SUA PONTUACAO: "+player.ponto+"\n" +
+                    "MELHOR PONTUACAO: "+melhorPontuacao
         } else {
             getQuestion(player)
         }

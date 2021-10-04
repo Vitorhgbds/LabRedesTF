@@ -37,26 +37,9 @@ class UDPClient {
         }
     }
 
-    static Runnable terminalWatch = new Runnable() {
-        @Override
-        void run() {
-            while (true){
-                try{
-                    if(i!=0) {
-                        data = System.in.newReader().readLine()
-                        data = data.getBytes("ASCII")
-                    }
-                    if (data=="-1") {
-                        try{
-                            System.exit(0)
-                        }catch(ignored){
-
-                        }
-                    }
-                }catch(ignored){}
-            }
-        }
-    }
+    /*
+        Thread que verifica se o cliente recebeu novas coisas do servidor
+    */
 
     static Runnable socketWatch = new Runnable() {
         @Override
@@ -68,9 +51,11 @@ class UDPClient {
                     socket.receive(response)
                     def s = new String(response.data, 0, response.length)
                     println s
+                    //// - area que avisa ao servidor após receber resposta, para testar o reenvio de mensagens do servidor comentar essa parte:
                     data = "Received".getBytes("ASCII")
                     def packet = new DatagramPacket(data, data.length,InetAddress.getByName("localhost"),5000)
                     socket.send(packet)
+                    ////
                 }catch(ignored){}
             }
         }

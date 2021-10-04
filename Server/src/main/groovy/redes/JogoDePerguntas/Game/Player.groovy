@@ -1,6 +1,10 @@
 package redes.JogoDePerguntas.Game
 
 import redes.JogoDePerguntas.Game.Questions.Questions
+/*
+    Essa classe representa o jogador, a pontuaçao, a lista de perguntas, o modo de jogo que ele
+     escolheu, a questão atual e se ele já finalizou o jogo
+*/
 
 class Player {
     def ponto

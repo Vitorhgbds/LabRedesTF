@@ -10,6 +10,9 @@ class UDPServer {
     static Map<Integer,String> lastResponses
     def static socketServer
 
+    /*
+        Servidor
+    */
     def static Server(){
         playerList = new HashMap<>()
         waitingResponse = new HashMap<>()
@@ -34,6 +37,10 @@ class UDPServer {
         }
     }
 
+
+    /*
+        Thread para verificar se o cliente nao respondeu
+    */
      static Runnable watch = new Runnable() {
 
         @Override
@@ -57,6 +64,9 @@ class UDPServer {
         }
     }
 
+    /*
+        Envia a ultima mensagem do servidor novamente
+    */
     static def sendResponseAgain(int port){
         def reply = lastResponses.get(port)
         def outgoing = new DatagramPacket(reply.bytes, reply.size(),
@@ -64,18 +74,33 @@ class UDPServer {
         socketServer.send(outgoing)
     }
 
+
+    /*
+        Gerencia as respostas recebidas pelo cliente
+    */
     def static Response(String s, Game game, Integer port){ println(port)
         waitingResponse.put(port, Server.properties."response.time" as int)
         switch (s){
+
+        /*
+            Mensagem de resposta do cliente
+        */
             case "Received": println(port + " Recebeu a mensagem")
                 waitingResponse.remove(port)
                 return "Received"
                 break;
-            case "0": return game.Menu()
             case "First Contact":
                 playerList.put(port,new Player())
                 return Game.menu;
                 break;
+        /*
+            Mensagem que retorna o menu
+        */
+            case "0": return game.Menu()
+                break
+        /*
+            Mensagens que definem o modo de jogo
+        */
             case "1": playerList.get(port).mode = GameMode.FACIL
                 game.Start(playerList.get(port))
                 return "Jogo facil iniciado \n\n" + game.getQuestion(playerList.get(port))
@@ -89,6 +114,9 @@ class UDPServer {
                 game.Start(playerList.get(port))
                 return "Jogo dificil  iniciado \n\n" + game.getQuestion(playerList.get(port))
                 break
+        /*
+            Mensagens que mostram as alternativas ecolhidas
+        */
             case "A": return game.VerifyAnswer("A",playerList.get(port)) +"\n\n" + game.getQuestion(playerList.get(port))
                 break
             case "B": return game.VerifyAnswer("B",playerList.get(port)) +"\n\n" + game.getQuestion(playerList.get(port))
