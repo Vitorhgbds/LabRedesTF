@@ -6,13 +6,14 @@ class UDPClient {
     def static data
     def static i
     def static Client(){
-        boolean qualquer=true
-        while (qualquer){
-            qualquer=false
+        // Para verificar se a porta ta ocupada, se ela estiver tenta na porta seguinte
+        boolean aux=true
+        while (aux){
+            aux=false
             try{
                 socket =new DatagramSocket(port);
             }catch(ignored){
-                qualquer = true
+                aux = true
                 port++
             }
         }
