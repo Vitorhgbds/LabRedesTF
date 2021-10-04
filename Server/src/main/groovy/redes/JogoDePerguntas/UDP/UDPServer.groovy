@@ -54,7 +54,7 @@ class UDPServer {
                             waitingResponse.put(k, Server.properties."response.time" as int)
                         } else {
                             value--
-                            println(value)
+                            println(k + " "+ value)
                             waitingResponse.put(k,value)
                         }
 
