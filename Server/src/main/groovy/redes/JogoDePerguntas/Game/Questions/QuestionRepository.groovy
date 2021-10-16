@@ -13,7 +13,7 @@ class QuestionRepository {
     def static CreateQuestionsFacil(){
         questionsFacil = new LinkedList<>();
         // Criando uma questão e informando o enunciado da questão e a alternativa correta
-        Questions questions1 = new Questions("Em qual nivel de camada o protocolo TCP/IP trabalha?","D");
+        Questions questions1 = new Questions("Em qual nivel de camada o protocolo IP trabalha?","D");
         Answers answers = new Answers()
         //Criando as alternativas
         answers.add("A","Aplicacao")
@@ -81,7 +81,6 @@ class QuestionRepository {
         questions6.answers = answers6
 
         questionsFacil.add(questions6)
-
 
         return questionsFacil
     }

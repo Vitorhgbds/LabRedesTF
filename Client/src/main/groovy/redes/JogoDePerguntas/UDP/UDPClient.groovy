@@ -52,11 +52,11 @@ class UDPClient {
                     socket.receive(response)
                     def s = new String(response.data, 0, response.length)
                     println s
-                    //// - area que avisa ao servidor após receber resposta, para testar o reenvio de mensagens do servidor comentar essa parte:
+                    // - area que avisa ao servidor após receber resposta, para testar o reenvio de mensagens do servidor comentar essa parte:
                     data = "Received".getBytes("ASCII")
                     def packet = new DatagramPacket(data, data.length,InetAddress.getByName("localhost"),5000)
                     socket.send(packet)
-                    ////
+
                 }catch(ignored){}
             }
         }

@@ -7,6 +7,8 @@ import redes.JogoDePerguntas.Game.Player
 class UDPServer {
     static Map<Integer, Player> playerList
     static volatile Map<Integer,Integer> waitingResponse
+    static volatile Map<Integer,Integer> waitingResponseCount
+    static volatile int count
     static Map<Integer,String> lastResponses
     def static socketServer
 
@@ -17,6 +19,7 @@ class UDPServer {
         playerList = new HashMap<>()
         waitingResponse = new HashMap<>()
         lastResponses = new HashMap<>()
+        waitingResponseCount = new HashMap<>()
         socketServer = new DatagramSocket(5000)
         def buffer = (' ' * 4096) as byte[]
         Game game = new Game()
@@ -36,8 +39,6 @@ class UDPServer {
             }
         }
     }
-
-
     /*
         Thread para verificar se o cliente nao respondeu
     */
@@ -50,14 +51,22 @@ class UDPServer {
                     Thread.sleep(1000)
                     waitingResponse.each {k,value ->
                         if(value<1) {
-                            sendResponseAgain(k)
-                            waitingResponse.put(k, Server.properties."response.time" as int)
+                            count = waitingResponseCount.get(k)
+                            if (count<=2) {
+                                count++
+                                waitingResponseCount.put(k, count)
+                                sendResponseAgain(k)
+                                waitingResponse.put(k, Server.properties."response.time" as int)
+                            } else {
+                                println("$k Removido por não responder após 3 tentativas")
+                                waitingResponseCount.remove(k)
+                                waitingResponse.remove(k)
+                            }
                         } else {
                             value--
                             println(k + " "+ value)
                             waitingResponse.put(k,value)
                         }
-
                     }
                 }catch(ignored){}
             }
@@ -80,6 +89,7 @@ class UDPServer {
     */
     def static Response(String s, Game game, Integer port){ println(port)
         waitingResponse.put(port, Server.properties."response.time" as int)
+        waitingResponseCount.put(port, 0)
         switch (s){
 
         /*
