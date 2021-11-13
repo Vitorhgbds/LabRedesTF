@@ -4,9 +4,6 @@ plugins {
 
     // Apply the application plugin to add support for building a CLI application.
     id 'application'
-
-    // Lombok plugin
-    id "io.freefair.lombok" version "5.1.1"
 }
 
 application {
@@ -36,13 +33,6 @@ dependencies {
 
     // Server
     implementation 'org.codehaus.groovy:groovy-templates:2.0.0'
-
-	// <TESTS> JUnit 5 
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.2'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.2'
-
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
 }
 
 //  TASKS ------------------
