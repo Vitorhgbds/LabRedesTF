@@ -16,15 +16,21 @@ class UDPServer {
         Servidor
     */
     def static Server(){
-        playerList = new HashMap<>()
-        waitingResponse = new HashMap<>()
-        lastResponses = new HashMap<>()
-        waitingResponseCount = new HashMap<>()
         socketServer = new DatagramSocket(5000)
+        lastResponses = new HashMap<>()
+        // aqui ele reenvia a mensagem (ou sabe quando reenviar)
+        waitingResponse = new HashMap<>()
+        // aqui ele ta contando quantas mensagens já reenviou
+        waitingResponseCount = new HashMap<>()
         def buffer = (' ' * 4096) as byte[]
+        new Thread(watch).start()
+        
+        // da pra remover
+        playerList = new HashMap<>()
         Game game = new Game()
         game.Menu()
-        new Thread(watch).start()
+        
+        
         while(true) {
             def incoming = new DatagramPacket(buffer, buffer.length)
             socketServer.receive(incoming)
@@ -103,6 +109,7 @@ class UDPServer {
                 playerList.put(port,new Player())
                 return Game.menu;
                 break;
+        //---------------- da pra remover ----------------//
         /*
             Mensagem que retorna o menu
         */
