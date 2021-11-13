@@ -55,23 +55,23 @@ class UDPServer {
             while (true){
                 try{
                     Thread.sleep(1000)
-                    waitingResponse.each {k,value ->
-                        if(value<1) {
-                            count = waitingResponseCount.get(k)
+                    waitingResponse.each {clientPort,waitingCountTime ->
+                        if(waitingCountTime<1) {
+                            count = waitingResponseCount.get(clientPort)
                             if (count<=2) {
                                 count++
-                                waitingResponseCount.put(k, count)
-                                sendResponseAgain(k)
-                                waitingResponse.put(k, Server.properties."response.time" as int)
+                                waitingResponseCount.put(clientPort, count)
+                                sendResponseAgain(clientPort)
+                                waitingResponse.put(clientPort, Server.properties."response.time" as int)
                             } else {
-                                println("$k Removido por não responder após 3 tentativas")
-                                waitingResponseCount.remove(k)
-                                waitingResponse.remove(k)
+                                println("$clientPort Removido por não responder após 3 tentativas")
+                                waitingResponseCount.remove(clientPort)
+                                waitingResponse.remove(clientPort)
                             }
                         } else {
-                            value--
-                            println(k + " "+ value)
-                            waitingResponse.put(k,value)
+                            waitingCountTime--
+                            println(clientPort + " "+ waitingCountTime)
+                            waitingResponse.put(clientPort,waitingCountTime)
                         }
                     }
                 }catch(ignored){}
@@ -83,9 +83,9 @@ class UDPServer {
         Envia a ultima mensagem do servidor novamente
     */
     static def sendResponseAgain(int port){
-        def reply = lastResponses.get(port)
-        def outgoing = new DatagramPacket(reply.bytes, reply.size(),
-                InetAddress.getByName("localhost") , port);
+        String reply = lastResponses.get(port)
+        DatagramPacket outgoing = new DatagramPacket(reply.bytes, reply.size(),
+                InetAddress.getByName("localhost") , port)
         socketServer.send(outgoing)
     }
 
@@ -93,8 +93,9 @@ class UDPServer {
     /*
         Gerencia as respostas recebidas pelo cliente
     */
-    def static Response(String s, Game game, Integer port){ println(port)
-        waitingResponse.put(port, Server.properties."response.time" as int)
+    def static Response(String s, Game game, Integer port){
+        println(port)
+        waitingResponse.put(port, Server.properties."response.time" as int) // Precisa dessa complexidade toda naum. da pra fazer no mapa mesmo. depois eu ajusto se for o caso :Jp
         waitingResponseCount.put(port, 0)
         switch (s){
 
