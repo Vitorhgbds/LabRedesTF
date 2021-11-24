@@ -22,15 +22,7 @@ repositories {
 
 
 dependencies {
-    // <LANGUAGE> Groovy
     implementation 'org.codehaus.groovy:groovy:3.0.5'
-    // implementation 'org.codehaus.groovy:groovy:3.0.0-rc-2'
-
-    // Beans
-    // implementation 'javax.enterprise:cdi-api:2.0.SP1'
-    // compile 'groovyx.gdi:gdi:0.1a-SNAPSHOT'
-
-    // Server
     implementation 'org.codehaus.groovy:groovy-templates:2.0.0'
 }
 
