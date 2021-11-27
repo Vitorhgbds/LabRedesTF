@@ -8,8 +8,8 @@ To do código:
 - [x] controle de erro da mensagem
 - [x] estabelicimento e encerramento da conexão
 - [x] squênciamento das mensagens
-- [ ] relatório
-- [ ] apagar a parte do jogo no código
+- [x] relatório
+- [x] apagar a parte do jogo no código
 - [ ] envio de dados (arquivos selecionados do computador)
 - [ ] controle de congestionamento
 - [ ] slow start
