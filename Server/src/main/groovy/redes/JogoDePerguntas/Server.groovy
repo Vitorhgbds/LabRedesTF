@@ -5,6 +5,7 @@ import redes.JogoDePerguntas.UDP.UDPServer
 class Server {
 
     static void main(String[] args) {
-        UDPServer.server()
+        UDPServer server = new UDPServer()
+        server.startExecution()
     }
 }

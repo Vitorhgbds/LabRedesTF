@@ -1,99 +1,43 @@
 package redes.JogoDePerguntas.UDP
-
-import redes.JogoDePerguntas.Server
-import redes.JogoDePerguntas.Game.Player
+/*
+       Servidor
+   */
 
 class UDPServer {
-    static Map<Integer, Player> playerList
-    static volatile Map<Integer, Integer> waitingResponse
-    static volatile Map<Integer, Integer> waitingResponseCount
-    static volatile int count
-    static Map<Integer, String> lastResponses
-    static DatagramSocket socketServer
+    private static final Integer BUFFER_SIZE = 4096
+    private DatagramSocket serverSocket
+    private MessageReceivedHandler messageReceivedHandler
 
-    /*
-        Servidor
-    */
+    UDPServer() {
+        serverSocket = new DatagramSocket(5000)
+        messageReceivedHandler = new MessageReceivedHandler()
+    }
 
-    static void server() {
-        socketServer = new DatagramSocket(5000)
-        lastResponses = new HashMap<>()
-        // aqui ele reenvia a mensagem (ou sabe quando reenviar)
-        waitingResponse = new HashMap<>()
-        // aqui ele ta contando quantas mensagens já reenviou
-        waitingResponseCount = new HashMap<>()
-        byte[] buffer = (' ' * 4096) as byte[]
-        new Thread(watch).start()
-
-        // da pra remover
-        playerList = new HashMap<>()
-
-
+    void startExecution() {
+        byte[] buffer = new byte[BUFFER_SIZE]
         while (true) {
             DatagramPacket incoming = new DatagramPacket(buffer, buffer.length)
-            socketServer.receive(incoming)
-            String clientMessage = new String(incoming.data, 0, incoming.length)
-            String reply = handleResponse(clientMessage, incoming.port)
-            if (reply != "Received") {
-                lastResponses.put(incoming.port, reply)
-                DatagramPacket outgoing = new DatagramPacket(reply.bytes, reply.size(),
-                        incoming.address, incoming.port);
-                socketServer.send(outgoing)
-            }
-        }
-    }
-    /*
-        Thread para verificar se o cliente nao respondeu
-    */
-    static Runnable watch = new Runnable() {
-
-        @Override
-        void run() {
-            while (true) {
-                try {
-                    Thread.sleep(1000)
-                    waitingResponse.each { clientPort, waitingCountTime ->
-                        if (waitingCountTime < 1) {
-                            count = waitingResponseCount.get(clientPort)
-                            if (count <= 2) {
-                                count++
-                                waitingResponseCount.put(clientPort, count)
-                                sendResponseAgain(clientPort)
-                                waitingResponse.put(clientPort, Server.properties."response.time" as int)
-                            } else {
-                                println("$clientPort Removido por não responder após 3 tentativas")
-                                waitingResponseCount.remove(clientPort)
-                                waitingResponse.remove(clientPort)
-                            }
-                        } else {
-                            waitingCountTime--
-                            println(clientPort + " " + waitingCountTime)
-                            waitingResponse.put(clientPort, waitingCountTime)
-                        }
-                    }
-                } catch (ignored) {
-                }
-            }
+            serverSocket.receive(incoming)
+            Packet packet = new Packet(incoming.data)
+            Packet reply = handleResponse(packet, incoming.port)
+            byte[] replyBytes = reply.toBytes()
+            DatagramPacket outgoing = new DatagramPacket(replyBytes, replyBytes.size(), incoming.address, incoming.port)
+            serverSocket.send(outgoing)
         }
     }
 
-    /*
-        Envia a ultima mensagem do servidor novamente
-    */
+/*
+    Gerencia as respostas recebidas pelo cliente
 
-    static def sendResponseAgain(int port) {
-        String reply = lastResponses.get(port)
-        DatagramPacket outgoing = new DatagramPacket(reply.bytes, reply.size(),
-                InetAddress.getByName("localhost"), port)
-        socketServer.send(outgoing)
-    }
+*/
 
-
-    /*
-        Gerencia as respostas recebidas pelo cliente
-    */
-
-    static String handleResponse(String response, Integer port) {
-        return "OK"
+    private Packet handleResponse(Packet response, Integer port) {
+        if (!messageReceivedHandler.hasClient(port)) {
+            messageReceivedHandler.saveClient(port, Integer.parseInt(response.stringData))
+            return Packet.buildPacketWithResponse('OK')
+        } else {
+            int packet = messageReceivedHandler.receivePacket(port, response)
+            return Packet.buildPacketWithResponse(packet.toString())
+        }
     }
 }
