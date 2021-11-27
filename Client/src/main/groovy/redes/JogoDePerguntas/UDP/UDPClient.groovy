@@ -1,10 +1,14 @@
 package redes.JogoDePerguntas.UDP
 
+import redes.JogoDePerguntas.UDP.Packet
+
 class UDPClient {
     def static port = 5001
     def static socket
     def static data
     def static i
+    static Integer messageid
+    static FileSenderInfo fileSenderInfo
 
     def static Client() {
         // Para verificar se a porta ta ocupada, se ela estiver tenta na porta seguinte
@@ -18,11 +22,19 @@ class UDPClient {
                 port++
             }
         }
-        data = "First Contact".getBytes("ASCII")
+        messageid = 0;
+        Packet packet
+        packet.messageId(messageid)
+        messageid++
+        data = "O MEU BAO VOU TE MANDAR 40 PACOTES BLZ?".getBytes("ASCII")
+//        e so por o data dentro do pacote
+        //packet.data(data)
+        fileSenderInfo.packetsToSend.add(packet)
         i = 0;
         new Thread(socketWatch).start()
         while (true) {
             if (i != 0) {
+                //fica verificando o terminal para entradas do usuario
                 data = System.in.newReader().readLine()
                 data = data.getBytes("ASCII")
             }
@@ -33,8 +45,8 @@ class UDPClient {
 
                 }
             }
-            def packet = new DatagramPacket(data, data.length, InetAddress.getByName("localhost"), 5000)
-            socket.send(packet)
+            def packet1 = new DatagramPacket(data, data.length, InetAddress.getByName("localhost"), 5000)
+            socket.send(packet1)
             i++
         }
     }
@@ -42,7 +54,6 @@ class UDPClient {
     /*
         Thread que verifica se o cliente recebeu novas coisas do servidor
     */
-
     static Runnable socketWatch = new Runnable() {
         @Override
         void run() {
@@ -57,7 +68,7 @@ class UDPClient {
                     data = "Received".getBytes("ASCII")
                     DatagramPacket packet = new DatagramPacket(data, data.length, InetAddress.getByName("localhost"), 5000)
                     socket.send(packet)
-
+                    socket.setSoTimeout(30000) // timeout para 30 secs
                 } catch (ignored) {}
             }
         }
