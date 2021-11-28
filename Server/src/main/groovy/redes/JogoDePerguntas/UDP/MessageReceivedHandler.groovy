@@ -24,12 +24,7 @@ class MessageReceivedHandler {
         return clientFileInfo.get(clientPort)
     }
 
-    int nextPacketToReceive(Integer port) {
-        FileSenderInfo fileSenderInfo = clientFileInfo.get(port)
-        return fileSenderInfo.nextPacketToReceive()
-    }
-
-    int receivePacketAndGenereteNext(Integer port, Packet packet) {
+    Optional<Integer> receivePacketAndGenerateNext(Integer port, Packet packet) {
         FileSenderInfo fileSenderInfo = clientFileInfo.get(port)
         fileSenderInfo.receivePacket(packet)
         return fileSenderInfo.nextPacketToReceive()
@@ -54,9 +49,9 @@ class FileSenderInfo {
         }
     }
 
-    Integer nextPacketToReceive() {
+    Optional<Integer> nextPacketToReceive() {
         Tuple2<Integer, Boolean> nextPacket = packetsToReceive.find { (!it.item2) }
-        return nextPacket?.item1
+        return Optional.ofNullable(nextPacket?.item1)
     }
 
 

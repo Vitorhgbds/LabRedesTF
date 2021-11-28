@@ -1,4 +1,4 @@
-package redes.JogoDePerguntas
+package redes.tf
 
 import redes.JogoDePerguntas.UDP.UDPClient
 

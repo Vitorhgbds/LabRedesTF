@@ -35,17 +35,14 @@ class UDPServer {
         if (!messageReceivedHandler.hasClient(port)) {
             messageReceivedHandler.saveClient(port, Integer.parseInt(response.stringData))
             return Packet.buildPacketWithResponse('OK')
-        } else if (response.stringData == 'FINISH') {
-            if (messageReceivedHandler.fileIsAlreadyAllSent(port)) {
+        } else {
+            Optional<Integer> nextPack = messageReceivedHandler.receivePacketAndGenerateNext(port, response)
+            if (messageReceivedHandler.fileIsAlreadyAllSent(port) && !nextPack.isPresent()) {
                 saveFile(port)
                 return Packet.buildPacketWithResponse("DONE")
             } else {
-                int packet = messageReceivedHandler.nextPacketToReceive(port)
-                return Packet.buildPacketWithResponse(packet.toString())
+                return Packet.buildAckPacket(response.messageId, nextPack.get())
             }
-        } else {
-            int nextPack = messageReceivedHandler.receivePacketAndGenereteNext(port, response)
-            return Packet.buildAckPacket(response.messageId, nextPack)
         }
     }
 
