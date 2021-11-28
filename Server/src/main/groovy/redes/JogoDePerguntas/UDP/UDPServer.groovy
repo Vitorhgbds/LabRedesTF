@@ -44,8 +44,8 @@ class UDPServer {
                 return Packet.buildPacketWithResponse(packet.toString())
             }
         } else {
-            int packet = messageReceivedHandler.receivePacketAndGenereteNext(port, response)
-            return Packet.buildPacketWithResponse(packet.toString())
+            int nextPack = messageReceivedHandler.receivePacketAndGenereteNext(port, response)
+            return Packet.buildAckPacket(response.messageId, nextPack)
         }
     }
 

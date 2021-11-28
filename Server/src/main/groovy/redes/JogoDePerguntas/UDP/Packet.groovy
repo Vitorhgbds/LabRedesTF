@@ -26,7 +26,11 @@ class Packet {
     }
 
     static Packet buildPacketWithResponse(String messageToRespond) {
-        return new Packet(messageId: 99999, data: messageToRespond.bytes)
+        return new Packet(messageId: -2, data: messageToRespond.bytes)
+    }
+
+    static Packet buildAckPacket(Integer packetToAck, Integer nextPacket) {
+        return new Packet(messageId: -1, data: "$packetToAck;$nextPacket".bytes)
     }
 
     String getStringData() {

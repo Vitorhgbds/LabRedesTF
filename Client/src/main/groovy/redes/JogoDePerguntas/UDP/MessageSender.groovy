@@ -7,13 +7,13 @@ class WatchRetransmitProcedure implements Runnable {
     private static final Integer RESPONSE_TIME = 10
     private Map<Integer, Integer> waitingResponse
     private Map<Integer, Integer> waitingResponseCount
-    private Map<Integer, String> lastResponses
+    private Map<Integer, String> lastMessages
     private DatagramSocket serverSocket
 
     WatchRetransmitProcedure(DatagramSocket serverSocket) {
         waitingResponse = [:]
         waitingResponseCount = [:]
-        lastResponses = [:]
+        lastMessages = [:]
         this.serverSocket = serverSocket
     }
 
@@ -52,7 +52,7 @@ class WatchRetransmitProcedure implements Runnable {
     */
 
     private void sendResponseAgain(int port) {
-        String reply = lastResponses.get(port)
+        String reply = lastMessages.get(port)
         DatagramPacket outgoing = new DatagramPacket(reply.bytes, reply.size(),
             InetAddress.getByName("localhost"), port)
         serverSocket.send(outgoing)
