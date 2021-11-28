@@ -1,9 +1,10 @@
 package redes.tf
 
-import redes.JogoDePerguntas.UDP.UDPClient
+import redes.tf.udp.UDPClient
 
 class Client {
-    public static void main(String[] args) {
-        UDPClient.Client()
+    static void main(String[] args) {
+        UDPClient client = new UDPClient()
+        client.startListening("teste.txt")
     }
 }

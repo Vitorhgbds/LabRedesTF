@@ -1,4 +1,4 @@
-package redes.JogoDePerguntas.UDP
+package redes.tf.udp
 
 import groovy.transform.Canonical
 import groovyjarjarantlr4.v4.runtime.misc.Tuple2
@@ -9,6 +9,10 @@ class MessageReceivedHandler {
 
     MessageReceivedHandler() {
         this.clientFileInfo = [:]
+    }
+
+    void cleanClient(Integer port){
+        clientFileInfo.remove(port)
     }
 
     void saveClient(Integer clientPort, Integer packetsToReceive) {
@@ -44,9 +48,10 @@ class FileSenderInfo {
 
 
     FileSenderInfo(int packetsToReceive) {
-        this.packetsToReceive = (1..packetsToReceive).toList().collect {
+        this.packetsToReceive = (0..packetsToReceive -1).toList().collect {
             return new Tuple2<Integer, Boolean>(it, false)
         }
+        this.receivedData = [:]
     }
 
     Optional<Integer> nextPacketToReceive() {

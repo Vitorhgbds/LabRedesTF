@@ -1,54 +1,64 @@
-package redes.tf.UDP
+package redes.tf.udp
 
 import java.nio.file.Files
 
 class UDPClient {
-    private static final Integer BUFFER_SIZE = 4096
+    private static final Integer BUFFER_SIZE = 10
     private MessageSender messageSender
-    private MessageReciver messageReciver
     private DatagramSocket socket
 
     UDPClient() {
         socket = new DatagramSocket()
         messageSender = new MessageSender(socket)
-
     }
-
 
     void startListening(String filePath) {
         byte[] fileData = loadFileData(filePath)
-        FileSenderInfo fileSenderInfo = new FileSenderInfo(fileData, BUFFER_SIZE, 1024)
-        new Thread(messageSender).start()
+        FileSenderInfo fileSenderInfo = new FileSenderInfo(fileData, BUFFER_SIZE, 3)
+        int packetsToSendFile = fileSenderInfo.packetsToSend.size()
+        messageSender.sendMessage(new Packet(messageId: -2, data: "$packetsToSendFile".bytes))
+        //Thread messageSenderThread = new Thread(messageSender).start()
+        byte[] buffer = new byte[BUFFER_SIZE]
         while (true) {
-            
+            DatagramPacket packetReceived = new DatagramPacket(buffer, BUFFER_SIZE)
+            println "Starting to listening\n\n"
+            socket.receive(packetReceived)
+            println "Receive Packet"
+            Packet packet = new Packet(packetReceived.data)
+            boolean shouldStop = onReceivedPacket(packet, fileSenderInfo)
+            if(shouldStop) break
         }
+    }
+
+    private boolean onReceivedPacket(Packet packet, FileSenderInfo fileSenderInfo) {
+        messageSender.removeRetransmit(packet.messageId)
+        String data = packet.stringData
+        if (data == 'OK') {
+            println "Server received first packet, will send file from now on"
+            List<Packet> packetsToSend = fileSenderInfo.getNext(1)
+            packetsToSend.each(messageSender.&sendMessage)
+            return false
+        } else if (data == 'DONE') {
+            println "Server Finished"
+            return true
+        } else {
+            println "Send File Content"
+            List<Packet> packetsToSend = fileSenderInfo.getNext(1)
+            packetsToSend.each(messageSender.&sendMessage)
+            return false
+        }
+
     }
 
     /*
-        Thread que verifica se o cliente recebeu novas coisas do servidor
-    */
-    static Runnable socketWatch = new Runnable() {
-        @Override
-        void run() {
-            while (true) {
-                try {
-                    byte[] buffer = (' ' * 4096) as byte[]
-                    DatagramPacket response = new DatagramPacket(buffer, buffer.length)
-                    socket.receive(response)
-                    String s = new String(response.data, 0, response.length)
-                    println s
-                    // - area que avisa ao servidor após receber resposta, para testar o reenvio de mensagens do servidor comentar essa parte:
-                    data = "Received".getBytes("ASCII")
-                    DatagramPacket packet = new DatagramPacket(data, data.length, InetAddress.getByName("localhost"), 5000)
-                    socket.send(packet)
-                    socket.setSoTimeout(30000) // timeout para 30 secs
-                } catch (ignored) {
-                }
-            }
-        }
-    }
+        DatagramPacket packetToReceive = new DatagramPacket(buffer, bufferSize)
+        socket.receive(packetToReceive)
+        byte[] receivedMessage = packetToReceive.data
+        Packet packet = new Packet(receivedMessage)
+        onReceive(packet)
+     */
 
     private byte[] loadFileData(String filePath) {
-        return Files.readAllBytes(new File(filePath).toPath())
+        return new File(filePath).bytes
     }
 }

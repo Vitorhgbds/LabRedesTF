@@ -1,11 +1,11 @@
-package redes.JogoDePerguntas.UDP
+package redes.tf.udp
 
 import groovy.transform.EqualsAndHashCode
 import groovy.transform.MapConstructor
 import groovy.transform.ToString
 
 @MapConstructor
-@ToString
+@ToString(includeNames = true)
 @EqualsAndHashCode
 class Packet {
     final Integer messageId
@@ -20,7 +20,7 @@ class Packet {
         String result = new String(trimData(receivedMessage))
         List<String> splitResult = result.split(";").toList()
         String messageId = splitResult[0]
-        String messageContent = splitResult.subList(1, splitResult.size())
+        String messageContent = splitResult.subList(1, splitResult.size()).join(";")
         this.messageId = Integer.parseInt(messageId)
         data = messageContent.bytes
     }

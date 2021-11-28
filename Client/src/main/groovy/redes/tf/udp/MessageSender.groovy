@@ -1,4 +1,4 @@
-package redes.tf.UDP
+package redes.tf.udp
 
 /**
  Thread para verificar se o cliente nao respondeu
@@ -20,14 +20,14 @@ class MessageSender implements Runnable {
 
     void sendMessage(Packet packet) {
         DatagramPacket packetToSend = this.buildPacketToServer(packet.toBytes())
+        println "Sending Message"
         serverSocket.send(packetToSend)
         lastMessages.put(packet.messageId, packet)
         waitingResponse.put(packet.messageId, RESPONSE_TIME)
     }
 
-    handleResponse(Packet packet) {
-        String messageIdAck = packet.stringData
-        lastMessages.remove(messageIdAck)
+    void removeRetransmit(int messageIdToRemove) {
+        lastMessages.remove(messageIdToRemove)
     }
 
     @Override

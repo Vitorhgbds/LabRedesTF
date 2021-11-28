@@ -1,7 +1,6 @@
-package redes.tf.UDP
+package redes.tf.udp
 
 import groovy.transform.Canonical
-import redes.tf.senderStrategy.SendStrategy
 
 class MessageSenderHandler {
     private FileSenderInfo fileInfo
@@ -30,7 +29,7 @@ class FileSenderInfo {
 
     List<Packet> getNext(Integer size) {
         List<Packet> toSend = []
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i < size && packetsToSend.size() > 0; i++) {
             Packet packetToSend = packetsToSend.pop()
             toSend.push(packetToSend)
             sentData.put(packetToSend.messageId, packetToSend)
@@ -42,10 +41,9 @@ class FileSenderInfo {
         List<List<Byte>> chunksOfBytes = file.toList().collate(bufferSize)
         return chunksOfBytes
             .withIndex().collect { List<Byte> bytes, Integer index ->
-            byte[] data = new byte[bytes.size()]
-            bytes.toArray(data)
-            return new Packet(messageId: index, data: data)
-        }
+                byte[] data = bytes.toArray() as byte[]
+                return new Packet(messageId: index, data: data)
+            }
     }
 }
 
