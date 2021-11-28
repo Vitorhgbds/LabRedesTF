@@ -7,7 +7,7 @@ class MessageReceivedHandler {
 
     private Map<Integer, FileSenderInfo> clientFileInfo
 
-    MessageSenderHandler() {
+    MessageReceivedHandler() {
         this.clientFileInfo = [:]
     }
 
