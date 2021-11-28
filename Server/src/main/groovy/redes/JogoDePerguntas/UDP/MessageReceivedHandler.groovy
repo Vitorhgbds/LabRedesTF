@@ -24,15 +24,26 @@ class MessageReceivedHandler {
         return clientFileInfo.get(clientPort)
     }
 
-    int receivePacket(Integer port, Packet packet) {
+    int nextPacketToReceive(Integer port) {
+        FileSenderInfo fileSenderInfo = clientFileInfo.get(port)
+        return fileSenderInfo.nextPacketToReceive()
+    }
+
+    int receivePacketAndGenereteNext(Integer port, Packet packet) {
         FileSenderInfo fileSenderInfo = clientFileInfo.get(port)
         fileSenderInfo.receivePacket(packet)
         return fileSenderInfo.nextPacketToReceive()
+    }
+
+    boolean fileIsAlreadyAllSent(int port) {
+        FileSenderInfo fileSenderInfo = clientFileInfo.get(port)
+        return fileSenderInfo.finish
     }
 }
 
 @Canonical
 class FileSenderInfo {
+    boolean finish = false
     private final List<Tuple2<Integer, Boolean>> packetsToReceive
     final Map<Integer, Packet> receivedData
 
@@ -45,7 +56,7 @@ class FileSenderInfo {
 
     Integer nextPacketToReceive() {
         Tuple2<Integer, Boolean> nextPacket = packetsToReceive.find { (!it.item2) }
-        return nextPacket.item1
+        return nextPacket?.item1
     }
 
 
@@ -55,6 +66,11 @@ class FileSenderInfo {
         packetsToReceive.removeElement(receivedPacket)
         packetsToReceive.add(new Tuple2<Integer, Boolean>(packetId, true))
         receivedData.put(packetId, packet)
+        finish = hasPacketToReceive()
+    }
+
+    private boolean hasPacketToReceive() {
+        return packetsToReceive.every { it.item2 }
     }
 }
 
