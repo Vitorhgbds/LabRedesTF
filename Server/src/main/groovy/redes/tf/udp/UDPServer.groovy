@@ -4,7 +4,8 @@ package redes.tf.udp
    */
 
 class UDPServer {
-    private static final Integer BUFFER_SIZE = 20
+    private static final Integer BUFFER_SIZE = 100
+
     private DatagramSocket serverSocket
     private MessageReceivedHandler messageReceivedHandler
 

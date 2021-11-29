@@ -34,7 +34,9 @@ class FileSenderInfo {
             toSend << packetToSend
             sentData.put(packetToSend.messageId, packetToSend)
         }
-        println "Get next got ${toSend.collect{it.messageId}.join(" ")}".toString()
+        if (!toSend.isEmpty()) {
+            println "Get next got ${toSend.collect{it.messageId}.join(" ")}".toString()
+        }
         return toSend
     }
 

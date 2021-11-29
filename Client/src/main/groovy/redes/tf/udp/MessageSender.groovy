@@ -54,7 +54,7 @@ class MessageSender implements Runnable {
                         onRetransmit.accept(messageId)
                     } else {
                         waitingCountTime--
-                        println(messageId + " " + waitingCountTime)
+                        println("Retransmit count for message: $messageId - waiting response: $waitingCountTime")
                         waitingResponse.put(messageId, waitingCountTime)
                     }
                 }

@@ -9,7 +9,7 @@ import redes.tf.udp.senderStrategy.SlowStartSenderStrategy
 
 
 class UDPClient {
-    private static final Integer BUFFER_SIZE = 20
+    private static final Integer BUFFER_SIZE = 100
     private MessageSender messageSender
     private SenderStrategyName currentStrategyName
     private List<SenderStrategy> strategies
@@ -20,14 +20,14 @@ class UDPClient {
         fastRetransmit = new FastRetransmitStrategyController()
         socket = new DatagramSocket()
         messageSender = new MessageSender(socket, this.&onError)
-        strategies = [new SlowStartSenderStrategy(messageSender), new CongestionAvoidanceSenderStrategy(messageSender)]
+        strategies = [new CongestionAvoidanceSenderStrategy(messageSender)]
         //strategies = [new SingleMessageSenderStrategy(messageSender)]
         currentStrategyName = strategies.first().name
     }
 
     void startListening(String filePath) {
         byte[] fileData = loadFileData(filePath)
-        FileSenderInfo fileSenderInfo = new FileSenderInfo(fileData, BUFFER_SIZE, 10)
+        FileSenderInfo fileSenderInfo = new FileSenderInfo(fileData, BUFFER_SIZE, 15)
         int packetsToSendFile = fileSenderInfo.packetsToSend.size()
         messageSender.sendMessage(new Packet(messageId: -2, data: "$packetsToSendFile".bytes))
         new Thread(messageSender).start()
@@ -64,7 +64,7 @@ class UDPClient {
             Integer requestNextMessageId = Integer.parseInt(ackMessageData[1])
             fastRetransmit.countMessage(requestNextMessageId)
             Integer shouldRetransmitMessage = fastRetransmit.getCountFor(requestNextMessageId)
-            println "Send File Content"
+            //println "Send File Content"
             if (shouldRetransmitMessage >= 3) {
                 println "Will retransmit missing message from server ${requestNextMessageId}"
                 Packet packetToResend = fileSenderInfo.retrievePacket(requestNextMessageId)
