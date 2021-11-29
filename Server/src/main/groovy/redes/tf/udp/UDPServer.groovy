@@ -25,6 +25,7 @@ class UDPServer {
             byte[] replyBytes = reply.toBytes()
             DatagramPacket outgoing = new DatagramPacket(replyBytes, replyBytes.size(), incoming.address, incoming.port)
             println "Sending Response"
+            buffer = new byte[BUFFER_SIZE]
             serverSocket.send(outgoing)
         }
     }

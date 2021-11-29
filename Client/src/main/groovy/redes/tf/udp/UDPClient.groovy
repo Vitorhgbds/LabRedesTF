@@ -30,7 +30,7 @@ class UDPClient {
         FileSenderInfo fileSenderInfo = new FileSenderInfo(fileData, BUFFER_SIZE, 3)
         int packetsToSendFile = fileSenderInfo.packetsToSend.size()
         messageSender.sendMessage(new Packet(messageId: -2, data: "$packetsToSendFile".bytes))
-        new Thread(messageSender).start()
+        //new Thread(messageSender).start()
         byte[] buffer = new byte[BUFFER_SIZE]
         while (true) {
             DatagramPacket packetReceived = new DatagramPacket(buffer, BUFFER_SIZE)
@@ -61,9 +61,9 @@ class UDPClient {
             String[] ackMessageData = data.split(";")
             Integer requestNextMessageId = Integer.parseInt(ackMessageData[1])
             fastRetransmit.countMessage(requestNextMessageId)
-            boolean shouldRetransmitMessage = fastRetransmit.getCountFor(requestNextMessageId)
+            Integer shouldRetransmitMessage = fastRetransmit.getCountFor(requestNextMessageId)
             println "Send File Content"
-            if (shouldRetransmitMessage) {
+            if (shouldRetransmitMessage >= 3) {
                 println "Will retransmit missing message from server"
                 Packet packetToResend = fileSenderInfo.retrievePacket(requestNextMessageId)
                 messageSender.removeRetransmit(requestNextMessageId)
