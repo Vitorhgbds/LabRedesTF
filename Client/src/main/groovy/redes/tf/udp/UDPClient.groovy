@@ -1,15 +1,26 @@
 package redes.tf.udp
 
-import java.nio.file.Files
+import redes.tf.udp.senderStrategy.CongestionAvoidanceSenderStrategy
+import redes.tf.udp.senderStrategy.FastRetransmitStrategyController
+import redes.tf.udp.senderStrategy.SenderStrategy
+import redes.tf.udp.senderStrategy.SenderStrategyName
+import redes.tf.udp.senderStrategy.SlowStartSenderStrategy
+
 
 class UDPClient {
     private static final Integer BUFFER_SIZE = 10
     private MessageSender messageSender
+    private SenderStrategyName currentStrategyName
+    private List<SenderStrategy> strategies
+    private FastRetransmitStrategyController fastRetransmit
     private DatagramSocket socket
 
     UDPClient() {
+        fastRetransmit = new FastRetransmitStrategyController()
         socket = new DatagramSocket()
-        messageSender = new MessageSender(socket)
+        messageSender = new MessageSender(socket, this.&onError)
+        strategies = [new SlowStartSenderStrategy(messageSender), new CongestionAvoidanceSenderStrategy(messageSender)]
+        currentStrategyName = SenderStrategyName.SLOW_START
     }
 
     void startListening(String filePath) {
@@ -17,7 +28,7 @@ class UDPClient {
         FileSenderInfo fileSenderInfo = new FileSenderInfo(fileData, BUFFER_SIZE, 3)
         int packetsToSendFile = fileSenderInfo.packetsToSend.size()
         messageSender.sendMessage(new Packet(messageId: -2, data: "$packetsToSendFile".bytes))
-        //Thread messageSenderThread = new Thread(messageSender).start()
+        new Thread(messageSender).start()
         byte[] buffer = new byte[BUFFER_SIZE]
         while (true) {
             DatagramPacket packetReceived = new DatagramPacket(buffer, BUFFER_SIZE)
@@ -26,8 +37,11 @@ class UDPClient {
             println "Receive Packet"
             Packet packet = new Packet(packetReceived.data)
             boolean shouldStop = onReceivedPacket(packet, fileSenderInfo)
-            if(shouldStop) break
+            if (shouldStop) break
         }
+        println "Will stop message sender retransmit loop"
+        messageSender.stopsWatch()
+
     }
 
     private boolean onReceivedPacket(Packet packet, FileSenderInfo fileSenderInfo) {
@@ -42,21 +56,35 @@ class UDPClient {
             println "Server Finished"
             return true
         } else {
+            String[] ackMessageData = data.split(";")
+            Integer requestNextMessageId = Integer.parseInt(ackMessageData[1])
+            fastRetransmit.countMessage(requestNextMessageId)
+            boolean shouldRetransmitMessage = fastRetransmit.getCountFor(requestNextMessageId)
             println "Send File Content"
-            List<Packet> packetsToSend = fileSenderInfo.getNext(1)
-            packetsToSend.each(messageSender.&sendMessage)
+            if (shouldRetransmitMessage) {
+                println "Will retransmit missing message from server"
+                Packet packetToResend = fileSenderInfo.retrievePacket(requestNextMessageId)
+                messageSender.removeRetransmit(requestNextMessageId)
+                messageSender.sendMessage(packetToResend)
+                onError(requestNextMessageId)
+                return false
+            }
+            SenderStrategy senderStrategy = findCurrentStrategy()
+            senderStrategy.sendByStrategy(fileSenderInfo)
             return false
         }
-
     }
 
-    /*
-        DatagramPacket packetToReceive = new DatagramPacket(buffer, bufferSize)
-        socket.receive(packetToReceive)
-        byte[] receivedMessage = packetToReceive.data
-        Packet packet = new Packet(receivedMessage)
-        onReceive(packet)
-     */
+    private void onError(Integer messageId) {
+        println "Error occurs on messageId $messageId, will execute strategy error handling for next messages"
+        SenderStrategy strategy = findCurrentStrategy()
+        SenderStrategyName nextStrategy = strategy.handleError()
+        this.currentStrategyName = nextStrategy
+    }
+
+    private SenderStrategy findCurrentStrategy() {
+        return strategies.find { it.name == this.currentStrategyName }
+    }
 
     private byte[] loadFileData(String filePath) {
         return new File(filePath).bytes

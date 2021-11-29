@@ -1,5 +1,10 @@
 package redes.tf.udp
 
+import redes.tf.udp.Packet
+
+import java.util.concurrent.Callable
+import java.util.function.Consumer
+
 /**
  Thread para verificar se o cliente nao respondeu
  */
@@ -7,14 +12,17 @@ class MessageSender implements Runnable {
     private static final Integer SERVER_PORT = 5000
     private static final Integer RESPONSE_TIME = 10
     private Map<Integer, Integer> waitingResponse
-//    private Map<Integer, Integer> waitingResponseCount
     private Map<Integer, Packet> lastMessages
     private DatagramSocket serverSocket
+    private boolean onGoing
+    private Consumer<Integer> onRetransmit
 
-    MessageSender(DatagramSocket serverSocket) {
+    MessageSender(DatagramSocket serverSocket, Consumer<Integer> onRetransmit) {
         waitingResponse = [:]
         //      waitingResponseCount = [:]
         lastMessages = [:]
+        onGoing = true
+        this.onRetransmit = onRetransmit
         this.serverSocket = serverSocket
     }
 
@@ -30,16 +38,20 @@ class MessageSender implements Runnable {
         lastMessages.remove(messageIdToRemove)
     }
 
+    void stopsWatch() {
+        onGoing = false
+    }
+
     @Override
     void run() {
-        while (true) {
+        while (onGoing) {
             try {
                 Thread.sleep(1000)
                 waitingResponse.each { messageId, waitingCountTime ->
                     if (waitingCountTime < 1) {
-                        //waitingResponseCount.put(messageId, count)
                         sendResponseAgain(messageId)
                         waitingResponse.put(messageId, RESPONSE_TIME)
+                        onRetransmit.accept(messageId)
                     } else {
                         waitingCountTime--
                         println(messageId + " " + waitingCountTime)
@@ -49,6 +61,7 @@ class MessageSender implements Runnable {
             } catch (ignored) {
             }
         }
+        println "Retransmit messageSender watch loop stops"
     }
 
 

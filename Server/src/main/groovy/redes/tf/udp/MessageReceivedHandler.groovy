@@ -46,7 +46,6 @@ class FileSenderInfo {
     private final List<Tuple2<Integer, Boolean>> packetsToReceive
     final Map<Integer, Packet> receivedData
 
-
     FileSenderInfo(int packetsToReceive) {
         this.packetsToReceive = (0..packetsToReceive -1).toList().collect {
             return new Tuple2<Integer, Boolean>(it, false)
