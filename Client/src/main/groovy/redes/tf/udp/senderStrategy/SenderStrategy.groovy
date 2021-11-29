@@ -8,11 +8,13 @@ interface SenderStrategy {
      * @return the name of the strategy
      */
     SenderStrategyName getName()
+
     /**
-     * Will execute the algorithm to send packets to server following the strategy rule
+     * * Will execute the algorithm to send packets to server following the strategy rule
      * @param senderInfo
+     * @return the next strategy
      */
-    void sendByStrategy(FileSenderInfo senderInfo)
+    SenderStrategyName sendByStrategy(FileSenderInfo senderInfo)
 
     /**
      * What must do when some errors occurs when trying to send message. e.g. Timeout

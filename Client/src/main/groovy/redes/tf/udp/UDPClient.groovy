@@ -20,7 +20,7 @@ class UDPClient {
         fastRetransmit = new FastRetransmitStrategyController()
         socket = new DatagramSocket()
         messageSender = new MessageSender(socket, this.&onError)
-        strategies = [new CongestionAvoidanceSenderStrategy(messageSender)]
+        strategies = [new SlowStartSenderStrategy(messageSender, 4), new CongestionAvoidanceSenderStrategy(messageSender)]
         //strategies = [new SingleMessageSenderStrategy(messageSender)]
         currentStrategyName = strategies.first().name
     }
@@ -74,7 +74,8 @@ class UDPClient {
                 return false
             }
             SenderStrategy senderStrategy = findCurrentStrategy()
-            senderStrategy.sendByStrategy(fileSenderInfo)
+            SenderStrategyName strategyName = senderStrategy.sendByStrategy(fileSenderInfo)
+            this.currentStrategyName = strategyName
             return false
         }
     }

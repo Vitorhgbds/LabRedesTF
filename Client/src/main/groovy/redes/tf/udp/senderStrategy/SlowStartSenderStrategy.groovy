@@ -7,9 +7,11 @@ import redes.tf.udp.Packet
 class SlowStartSenderStrategy implements SenderStrategy {
     private MessageSender sender
     private int exp
+    private int expLimit
 
-    SlowStartSenderStrategy(MessageSender sender) {
+    SlowStartSenderStrategy(MessageSender sender, int expLimit) {
         this.sender = sender
+        this.expLimit = expLimit
         this.exp = 0
     }
 
@@ -18,12 +20,18 @@ class SlowStartSenderStrategy implements SenderStrategy {
         return SenderStrategyName.SLOW_START
     }
 
-    void sendByStrategy(FileSenderInfo senderInfo) {
+    SenderStrategyName sendByStrategy(FileSenderInfo senderInfo) {
         int numberToGet = Math.pow(2, exp) as Integer
         List<Packet> packetsToSend = senderInfo.getNext(numberToGet)
         if (!packetsToSend.isEmpty()) {
             exp++
             packetsToSend.each(sender.&sendMessage)
+        }
+        if (exp == expLimit) {
+            exp = 0
+            return SenderStrategyName.CONGESTION_AVOIDANCE
+        } else {
+            return SenderStrategyName.SLOW_START
         }
     }
 

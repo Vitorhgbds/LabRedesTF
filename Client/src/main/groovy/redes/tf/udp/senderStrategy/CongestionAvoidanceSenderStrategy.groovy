@@ -20,12 +20,13 @@ class CongestionAvoidanceSenderStrategy implements SenderStrategy {
     }
 
     @Override
-    void sendByStrategy(FileSenderInfo senderInfo) {
+    SenderStrategyName sendByStrategy(FileSenderInfo senderInfo) {
         List<Packet> packets = senderInfo.getNext(currentNumber)
         if (!packets.isEmpty()) {
             currentNumber++
             packets.each(sender.&sendMessage)
         }
+        return name
     }
 
     @Override

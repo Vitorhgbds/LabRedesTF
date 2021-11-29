@@ -17,9 +17,10 @@ class SingleMessageSenderStrategy implements SenderStrategy {
     }
 
     @Override
-    void sendByStrategy(FileSenderInfo senderInfo) {
+    SenderStrategyName sendByStrategy(FileSenderInfo senderInfo) {
         List<Packet> packetsToSend = senderInfo.getNext(1)
         packetsToSend.each(sender.&sendMessage)
+        return name
     }
 
     @Override
