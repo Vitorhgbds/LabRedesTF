@@ -4,6 +4,7 @@ import redes.tf.udp.senderStrategy.CongestionAvoidanceSenderStrategy
 import redes.tf.udp.senderStrategy.FastRetransmitStrategyController
 import redes.tf.udp.senderStrategy.SenderStrategy
 import redes.tf.udp.senderStrategy.SenderStrategyName
+import redes.tf.udp.senderStrategy.SingleMessageSenderStrategy
 import redes.tf.udp.senderStrategy.SlowStartSenderStrategy
 
 
@@ -19,8 +20,9 @@ class UDPClient {
         fastRetransmit = new FastRetransmitStrategyController()
         socket = new DatagramSocket()
         messageSender = new MessageSender(socket, this.&onError)
-        strategies = [new SlowStartSenderStrategy(messageSender), new CongestionAvoidanceSenderStrategy(messageSender)]
-        currentStrategyName = SenderStrategyName.SLOW_START
+        //strategies = [new SlowStartSenderStrategy(messageSender), new CongestionAvoidanceSenderStrategy(messageSender)]
+        strategies = [new SingleMessageSenderStrategy(messageSender)]
+        currentStrategyName = strategies.first().name
     }
 
     void startListening(String filePath) {

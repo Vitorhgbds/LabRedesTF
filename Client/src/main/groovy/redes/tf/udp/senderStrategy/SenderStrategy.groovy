@@ -26,5 +26,6 @@ interface SenderStrategy {
  */
 enum SenderStrategyName {
     SLOW_START,
-    CONGESTION_AVOIDANCE
+    CONGESTION_AVOIDANCE,
+    SINGLE_SENDER
 }
