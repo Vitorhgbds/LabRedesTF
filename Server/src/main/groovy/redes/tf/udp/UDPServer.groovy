@@ -5,6 +5,7 @@ package redes.tf.udp
 
 class UDPServer {
     private static final Integer BUFFER_SIZE = 100
+    private MessageSender messageSender
 
     private DatagramSocket serverSocket
     private MessageReceivedHandler messageReceivedHandler
@@ -12,10 +13,12 @@ class UDPServer {
     UDPServer() {
         serverSocket = new DatagramSocket(5000)
         messageReceivedHandler = new MessageReceivedHandler()
+        messageSender = new MessageSender(serverSocket, this.&onError)
     }
 
     void startExecution() {
         byte[] buffer = new byte[BUFFER_SIZE]
+        new Thread(messageSender).start()
         while (true) {
             DatagramPacket incoming = new DatagramPacket(buffer, buffer.length)
             println "Will Start listing\n\n"
@@ -25,9 +28,9 @@ class UDPServer {
             Packet reply = handleResponse(packet, incoming.port)
             byte[] replyBytes = reply.toBytes()
             DatagramPacket outgoing = new DatagramPacket(replyBytes, replyBytes.size(), incoming.address, incoming.port)
+            messageSender.sendMessage(outgoing)
             println "Sending Response"
             buffer = new byte[BUFFER_SIZE]
-            serverSocket.send(outgoing)
         }
     }
 
@@ -47,6 +50,7 @@ class UDPServer {
                 println "File is complete"
                 saveFile(port)
                 messageReceivedHandler.cleanClient(port)
+                messageSender.removeRetransmit(response.messageId)
                 return Packet.buildPacketWithResponse("DONE")
             } else {
                 println "Ack and ask next file part ${nextPack.get()}"
@@ -65,6 +69,11 @@ class UDPServer {
                 fos.write(it.data)
             }
             fos.flush()
+            fos.close()
         } catch (Exception ignore) {}
+    }
+
+    private void onError(Integer messageId) {
+        println "Error occurs on messageId $messageId"
     }
 }
