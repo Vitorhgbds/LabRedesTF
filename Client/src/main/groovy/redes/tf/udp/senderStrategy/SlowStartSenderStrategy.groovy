@@ -21,8 +21,10 @@ class SlowStartSenderStrategy implements SenderStrategy {
     void sendByStrategy(FileSenderInfo senderInfo) {
         int numberToGet = Math.pow(2, exp) as Integer
         List<Packet> packetsToSend = senderInfo.getNext(numberToGet)
-        exp++
-        packetsToSend.each(sender.&sendMessage)
+        if (!packetsToSend.isEmpty()) {
+            exp++
+            packetsToSend.each(sender.&sendMessage)
+        }
     }
 
     @Override

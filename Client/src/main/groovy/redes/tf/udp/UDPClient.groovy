@@ -52,7 +52,9 @@ class UDPClient {
         if (data == 'OK') {
             println "Server received first packet, will send file from now on"
             List<Packet> packetsToSend = fileSenderInfo.getNext(1)
-            packetsToSend.each(messageSender.&sendMessage)
+            if (!packetsToSend.isEmpty()) {
+                packetsToSend.each(messageSender.&sendMessage)
+            }
             return false
         } else if (data == 'DONE') {
             println "Server Finished"
