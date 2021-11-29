@@ -1,6 +1,6 @@
 package redes.tf
 
-import redes.JogoDePerguntas.UDP.UDPServer
+import redes.tf.udp.UDPServer
 
 class Server {
 
