@@ -27,8 +27,8 @@ class UDPServer {
             println "Received Packet $packet"
             Packet reply = handleResponse(packet, incoming.port)
             byte[] replyBytes = reply.toBytes()
-            DatagramPacket outgoing = new DatagramPacket(replyBytes, replyBytes.size(), incoming.address, incoming.port)
-            messageSender.sendMessage(outgoing)
+            //DatagramPacket outgoing = new DatagramPacket(replyBytes, replyBytes.size(), incoming.address, incoming.port)
+            messageSender.sendMessage(reply)
             println "Sending Response"
             buffer = new byte[BUFFER_SIZE]
         }
@@ -39,18 +39,23 @@ class UDPServer {
 
 */
 
+    private void handleAck(Packet response){
+        messageSender.removeRetransmit(Integer.parseInt(response.stringData.split(";").toList().first()))
+    }
+
     private Packet handleResponse(Packet response, Integer port) {
-        if (!messageReceivedHandler.hasClient(port)) {
+        if (response.messageId==-1) handleAck(response)
+            if (!messageReceivedHandler.hasClient(port)) {
             messageReceivedHandler.saveClient(port, Integer.parseInt(response.stringData))
             println "Client does not exisits, will responde OK"
             return Packet.buildPacketWithResponse('OK')
         } else {
             Optional<Integer> nextPack = messageReceivedHandler.receivePacketAndGenerateNext(port, response)
+            messageSender.removeRetransmit(response.messageId)
             if (messageReceivedHandler.fileIsAlreadyAllSent(port) && !nextPack.isPresent()) {
                 println "File is complete"
                 saveFile(port)
                 messageReceivedHandler.cleanClient(port)
-                messageSender.removeRetransmit(response.messageId)
                 return Packet.buildPacketWithResponse("DONE")
             } else {
                 println "Ack and ask next file part ${nextPack.get()}"

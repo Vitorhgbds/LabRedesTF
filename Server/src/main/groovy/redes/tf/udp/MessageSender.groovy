@@ -25,12 +25,12 @@ class MessageSender implements Runnable {
         this.serverSocket = serverSocket
     }
 
-    void sendMessage(DatagramPacket packet) {
+    void sendMessage(Packet packet) {
+        DatagramPacket packetToSend = this.buildPacketToServer(packet.toBytes())
         println "Sending Message"
-        serverSocket.send(packet)
-        Packet packet1 = new Packet(packet.data)
-        lastMessages.put(packet1.messageId, packet1)
-        waitingResponse.put(packet1.messageId, RESPONSE_TIME)
+        serverSocket.send(packetToSend)
+        lastMessages.put(packet.messageId, packet)
+        waitingResponse.put(packet.messageId, RESPONSE_TIME)
     }
 
     void removeRetransmit(int messageIdToRemove) {

@@ -24,6 +24,9 @@ class Packet {
         this.messageId = Integer.parseInt(messageId)
         data = messageContent.bytes
     }
+    static Packet buildAckPacket(Integer packetToAck, Integer nextPacket) {
+        return new Packet(messageId: -1, data: "$packetToAck;$nextPacket".bytes)
+    }
 
     String getStringData() {
         return new String(this.data)

@@ -38,6 +38,7 @@ class UDPClient {
             socket.receive(packetReceived)
             println "Receive Packet"
             Packet packet = new Packet(packetReceived.data)
+            buffer = new byte[BUFFER_SIZE]
             boolean shouldStop = onReceivedPacket(packet, fileSenderInfo)
             if (shouldStop) break
         }
@@ -48,7 +49,9 @@ class UDPClient {
 
     private boolean onReceivedPacket(Packet packet, FileSenderInfo fileSenderInfo) {
         messageSender.removeRetransmit(packet.messageId)
+        Packet ack = Packet.buildAckPacket(packet.messageId, -1)
         String data = packet.stringData
+        messageSender.sendMessage(ack)
         if (data == 'OK') {
             println "Server received first packet, will send file from now on"
             List<Packet> packetsToSend = fileSenderInfo.getNext(1)
