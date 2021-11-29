@@ -20,8 +20,8 @@ class UDPClient {
         fastRetransmit = new FastRetransmitStrategyController()
         socket = new DatagramSocket()
         messageSender = new MessageSender(socket, this.&onError)
-        //strategies = [new SlowStartSenderStrategy(messageSender), new CongestionAvoidanceSenderStrategy(messageSender)]
-        strategies = [new SingleMessageSenderStrategy(messageSender)]
+        strategies = [new SlowStartSenderStrategy(messageSender), new CongestionAvoidanceSenderStrategy(messageSender)]
+        //strategies = [new SingleMessageSenderStrategy(messageSender)]
         currentStrategyName = strategies.first().name
     }
 
@@ -30,7 +30,7 @@ class UDPClient {
         FileSenderInfo fileSenderInfo = new FileSenderInfo(fileData, BUFFER_SIZE, 3)
         int packetsToSendFile = fileSenderInfo.packetsToSend.size()
         messageSender.sendMessage(new Packet(messageId: -2, data: "$packetsToSendFile".bytes))
-        //new Thread(messageSender).start()
+        new Thread(messageSender).start()
         byte[] buffer = new byte[BUFFER_SIZE]
         while (true) {
             DatagramPacket packetReceived = new DatagramPacket(buffer, BUFFER_SIZE)
@@ -64,7 +64,7 @@ class UDPClient {
             Integer shouldRetransmitMessage = fastRetransmit.getCountFor(requestNextMessageId)
             println "Send File Content"
             if (shouldRetransmitMessage >= 3) {
-                println "Will retransmit missing message from server"
+                println "Will retransmit missing message from server ${requestNextMessageId}"
                 Packet packetToResend = fileSenderInfo.retrievePacket(requestNextMessageId)
                 messageSender.removeRetransmit(requestNextMessageId)
                 messageSender.sendMessage(packetToResend)

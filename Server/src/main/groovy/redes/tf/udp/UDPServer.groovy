@@ -48,7 +48,7 @@ class UDPServer {
                 messageReceivedHandler.cleanClient(port)
                 return Packet.buildPacketWithResponse("DONE")
             } else {
-                println "Ack and ask next file part"
+                println "Ack and ask next file part ${nextPack.get()}"
                 return Packet.buildAckPacket(response.messageId, nextPack.get())
             }
         }

@@ -31,9 +31,10 @@ class FileSenderInfo {
         List<Packet> toSend = []
         for (int i = 0; i < size && packetsToSend.size() > 0; i++) {
             Packet packetToSend = packetsToSend.pop()
-            toSend.push(packetToSend)
+            toSend << packetToSend
             sentData.put(packetToSend.messageId, packetToSend)
         }
+        println "Get next got ${toSend.collect{it.messageId}.join(" ")}".toString()
         return toSend
     }
 
