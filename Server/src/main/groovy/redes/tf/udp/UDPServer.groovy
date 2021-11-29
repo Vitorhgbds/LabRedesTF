@@ -55,5 +55,14 @@ class UDPServer {
 
     private void saveFile(int clientPort) {
         println "RECEBI O ARQUIVO DO $clientPort"
+        FileSenderInfo file = messageReceivedHandler.getFromClient(clientPort)
+        Packet[] packetList = new Packet[file.receivedData.size()]
+        file.receivedData.each {id,value -> packetList[id] = value }
+        try (FileOutputStream fos = new FileOutputStream(new File("file_${clientPort}.txt"))) {
+            packetList.each {
+                fos.write(it.data)
+            }
+            fos.flush()
+        } catch (Exception ignore) {}
     }
 }
