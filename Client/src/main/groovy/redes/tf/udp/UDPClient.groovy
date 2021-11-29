@@ -9,7 +9,7 @@ import redes.tf.udp.senderStrategy.SlowStartSenderStrategy
 
 
 class UDPClient {
-    private static final Integer BUFFER_SIZE = 10
+    private static final Integer BUFFER_SIZE = 20
     private MessageSender messageSender
     private SenderStrategyName currentStrategyName
     private List<SenderStrategy> strategies
@@ -27,7 +27,7 @@ class UDPClient {
 
     void startListening(String filePath) {
         byte[] fileData = loadFileData(filePath)
-        FileSenderInfo fileSenderInfo = new FileSenderInfo(fileData, BUFFER_SIZE, 3)
+        FileSenderInfo fileSenderInfo = new FileSenderInfo(fileData, BUFFER_SIZE, 10)
         int packetsToSendFile = fileSenderInfo.packetsToSend.size()
         messageSender.sendMessage(new Packet(messageId: -2, data: "$packetsToSendFile".bytes))
         new Thread(messageSender).start()
